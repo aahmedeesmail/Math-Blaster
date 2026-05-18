@@ -72,7 +72,7 @@
         .hud-top {
             display: flex;
             justify-content: space-between;
-            padding: 15px;
+            padding: 10px;
             width: 100%;
             box-sizing: border-box;
             z-index: 10;
@@ -90,14 +90,33 @@
 
         .physics-data {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            font-size: 0.9rem;
+            top: 145px; /* Safely placed below the mobile Equation Box */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
             color: #fca5a5;
-            background: rgba(0,0,0,0.6);
-            padding: 8px 15px;
-            border-radius: 8px;
-            border-left: 4px solid #f43f5e;
+            background: rgba(0,0,0,0.85);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        @media (min-width: 768px) {
+            .physics-data {
+                top: auto;
+                bottom: 20px;
+                left: 20px;
+                transform: none;
+                font-size: 0.9rem;
+                border-radius: 8px;
+                border: none;
+                border-left: 4px solid #f43f5e;
+                background: rgba(0,0,0,0.6);
+                padding: 8px 15px;
+            }
         }
 
         .glow-text {
@@ -154,25 +173,53 @@
 
     <!-- IN-GAME UI (HUD) -->
     <div class="ui-layer" id="game-ui" style="display: none;">
-        <div class="hud-top">
-            <div class="hud-panel">
-                <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Level Target</div>
-                <div class="font-sci text-2xl text-white"><span id="ui-level">1</span> / 10</div>
-            </div>
+        <div class="hud-top flex flex-col md:flex-row justify-between items-stretch gap-2">
             
-            <div class="hud-panel flex-grow mx-4 max-w-lg bg-red-950/80 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                <div class="text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">Target Equation</div>
-                <div class="font-sci text-3xl md:text-4xl text-white glow-text" id="ui-equation">5 + 5 = ?</div>
+            <!-- MOBILE COMPACT ROW (Level, Timer, Lives grouped) -->
+            <div class="flex md:hidden justify-between items-center w-full gap-2 px-1">
+                <div class="hud-panel py-1.5 px-3 flex-1 text-center bg-red-950/90 border-rose-600 shadow-md">
+                    <div class="text-rose-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Level</div>
+                    <div class="font-sci text-sm text-white" id="ui-level-mob">1 / 10</div>
+                </div>
+                
+                <div class="hud-panel py-1.5 px-3 flex-1 text-center bg-red-950/90 border-rose-600 shadow-md">
+                    <div class="text-amber-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Time</div>
+                    <div class="font-sci text-sm text-amber-400 glow-text" id="ui-time-mob">20s</div>
+                </div>
+                
+                <div class="hud-panel py-1.5 px-3 flex-1 text-center bg-red-950/90 border-rose-600 shadow-md">
+                    <div class="text-rose-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Integrity</div>
+                    <div class="text-xs tracking-tighter" id="ui-lives-mob">❤️❤️❤️</div>
+                </div>
             </div>
-            
-            <div class="hud-panel w-48">
-                <div class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">Time Energy</div>
-                <div class="font-sci text-3xl text-amber-400 glow-text" id="ui-time">20s</div>
+
+            <!-- MOBILE DEDICATED PROMINENT EQUATION CARD -->
+            <div class="hud-panel md:hidden w-full text-center py-2 bg-red-950/85 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <div class="text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Target Equation</div>
+                <div class="font-sci text-2xl text-white glow-text" id="ui-equation-mob">5 + 5 = ?</div>
             </div>
-            
-            <div class="hud-panel">
-                <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Structural Integrity</div>
-                <div class="text-2xl tracking-widest drop-shadow-md" id="ui-lives">❤️❤️❤️</div>
+
+            <!-- DESKTOP PANELS (Hidden completely on mobile) -->
+            <div class="hidden md:flex justify-between items-center w-full">
+                <div class="hud-panel">
+                    <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Level Target</div>
+                    <div class="font-sci text-2xl text-white"><span id="ui-level">1</span> / 10</div>
+                </div>
+                
+                <div class="hud-panel flex-grow mx-4 max-w-lg bg-red-950/80 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                    <div class="text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">Target Equation</div>
+                    <div class="font-sci text-3xl md:text-4xl text-white glow-text" id="ui-equation">5 + 5 = ?</div>
+                </div>
+                
+                <div class="hud-panel w-48">
+                    <div class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">Time Energy</div>
+                    <div class="font-sci text-3xl text-amber-400 glow-text" id="ui-time">20s</div>
+                </div>
+                
+                <div class="hud-panel">
+                    <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Structural Integrity</div>
+                    <div class="text-2xl tracking-widest drop-shadow-md" id="ui-lives">❤️❤️❤️</div>
+                </div>
             </div>
         </div>
         
@@ -337,7 +384,10 @@
             }
             
             currentMath = { q: `${num1} ${op} ${num2} = ?`, a: ans };
+            
+            // Sync equation fields
             document.getElementById('ui-equation').innerText = currentMath.q;
+            document.getElementById('ui-equation-mob').innerText = currentMath.q;
 
             // Generate two plausible but incorrect answers
             let wrongs = [ans + Math.floor(Math.random()*4)+1, ans - Math.floor(Math.random()*3)-1];
@@ -359,7 +409,7 @@
                 { r: 45, mov: false, spd: 0, g: 0.4, gl: "ADDITION | NORMAL GRAVITY", c: '#38bdf8' },
                 { r: 40, mov: false, spd: 0, g: 0.4, gl: "ADDITION | NORMAL GRAVITY", c: '#38bdf8' },
                 { r: 40, mov: true, spd: 1.5, g: 0.15, gl: "ADDITION | MOON GRAVITY", c: '#fde047' },
-                { r: 45, mov: false, spd: 0, g: 0.4, gl: "SUBTRACTION | NORMAL GRAVITY", c: '#f43f5e' },
+                { r: 45, mov: false, spd: 0, g: 0.4, gl: "SUBTRACTION | NORMAL", c: '#f43f5e' },
                 { r: 40, mov: true, spd: 2, g: 0.8, gl: "SUBTRACTION | HIGH GRAVITY", c: '#e11d48' },
                 { r: 35, mov: true, spd: 2.5, g: 0.15, gl: "SUBTRACTION | MOON GRAVITY", c: '#fde047' },
                 { r: 40, mov: false, spd: 0, g: 0.4, gl: "MULTIPLICATION | NORMAL", c: '#c084fc' },
@@ -374,19 +424,34 @@
             state.gravity = d.g;
             state.gravityLabel = d.gl;
             document.getElementById('ui-physics-env').style.color = d.c;
-            document.getElementById('ui-level').innerText = state.level;
             document.getElementById('ui-physics-env').innerText = state.gravityLabel;
+
+            // Sync level fields
+            const lvlText = `${state.level} / 10`;
+            document.getElementById('ui-level').innerText = lvlText;
+            document.getElementById('ui-level-mob').innerText = lvlText;
 
             let answers = generateMath(state.level);
             
-            // Spawn 3 targets at random heights on the right side
-            targets = [];
-            const yPositions = [height * 0.25, height * 0.5, height * 0.75];
+            // Prevent targets spawning hidden behind HUD overlays
+            let hudOffset = width < 768 ? 140 : 90;
+            let playHeight = height - hudOffset - 120;
+            
+            const yPositions = [
+                hudOffset + playHeight * 0.22,
+                hudOffset + playHeight * 0.5,
+                hudOffset + playHeight * 0.78
+            ];
             yPositions.sort(() => Math.random() - 0.5); // Shuffle heights
 
+            targets = [];
             for(let i=0; i<3; i++) {
+                let targetX = width < 600 ? 
+                    (width * 0.65 + Math.random() * (width * 0.12)) : 
+                    (width * 0.7 + Math.random() * (width * 0.15));
+                
                 targets.push({
-                    x: width * 0.7 + Math.random() * (width * 0.15), 
+                    x: targetX, 
                     y: yPositions[i],
                     baseY: yPositions[i],
                     radius: d.r,
@@ -479,7 +544,9 @@
         function updateLivesUI() {
             let h = '';
             for(let i=0; i<state.lives; i++) h += '❤️';
-            document.getElementById('ui-lives').innerText = h || '💥';
+            const livesStr = h || '💥';
+            document.getElementById('ui-lives').innerText = livesStr;
+            document.getElementById('ui-lives-mob').innerText = livesStr;
         }
 
         function showScreen(id) {
@@ -540,7 +607,10 @@
             if (!projectile.active) {
                 state.lastTime = currentTime;
                 state.timeRemaining -= dt;
-                document.getElementById('ui-time').innerText = Math.ceil(Math.max(0, state.timeRemaining)) + 's';
+                
+                const timeStr = Math.ceil(Math.max(0, state.timeRemaining)) + 's';
+                document.getElementById('ui-time').innerText = timeStr;
+                document.getElementById('ui-time-mob').innerText = timeStr;
                 
                 if (state.timeRemaining <= 0) {
                     handleMiss();
