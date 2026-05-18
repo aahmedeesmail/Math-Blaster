@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Math Blaster: Trajectory Edition</title>
+    <title>Time Blaster: History Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -178,7 +178,7 @@
             <!-- MOBILE COMPACT ROW (Level, Timer, Lives grouped) -->
             <div class="flex md:hidden justify-between items-center w-full gap-2 px-1">
                 <div class="hud-panel py-1.5 px-3 flex-1 text-center bg-red-950/90 border-rose-600 shadow-md">
-                    <div class="text-rose-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Level</div>
+                    <div class="text-rose-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Era</div>
                     <div class="font-sci text-sm text-white" id="ui-level-mob">1 / 10</div>
                 </div>
                 
@@ -193,22 +193,22 @@
                 </div>
             </div>
 
-            <!-- MOBILE DEDICATED PROMINENT EQUATION CARD -->
+            <!-- MOBILE DEDICATED PROMINENT QUESTION CARD -->
             <div class="hud-panel md:hidden w-full text-center py-2 bg-red-950/85 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                <div class="text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Target Equation</div>
-                <div class="font-sci text-2xl text-white glow-text" id="ui-equation-mob">5 + 5 = ?</div>
+                <div class="text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">History Mission Clue</div>
+                <div class="font-sci text-base text-white glow-text leading-tight" id="ui-equation-mob">Who built pyramids?</div>
             </div>
 
             <!-- DESKTOP PANELS (Hidden completely on mobile) -->
             <div class="hidden md:flex justify-between items-center w-full">
                 <div class="hud-panel">
-                    <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Level Target</div>
+                    <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Time Era</div>
                     <div class="font-sci text-2xl text-white"><span id="ui-level">1</span> / 10</div>
                 </div>
                 
                 <div class="hud-panel flex-grow mx-4 max-w-lg bg-red-950/80 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                    <div class="text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">Target Equation</div>
-                    <div class="font-sci text-3xl md:text-4xl text-white glow-text" id="ui-equation">5 + 5 = ?</div>
+                    <div class="text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">History Mission Clue</div>
+                    <div class="font-sci text-xl md:text-2xl text-white glow-text" id="ui-equation">Who built pyramids?</div>
                 </div>
                 
                 <div class="hud-panel w-48">
@@ -217,7 +217,7 @@
                 </div>
                 
                 <div class="hud-panel">
-                    <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Structural Integrity</div>
+                    <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Temporal Integrity</div>
                     <div class="text-2xl tracking-widest drop-shadow-md" id="ui-lives">❤️❤️❤️</div>
                 </div>
             </div>
@@ -231,27 +231,27 @@
     <!-- START SCREEN (Fully Scrollable on Phones) -->
     <div id="screen-start" class="screen active">
         <div class="screen-content">
-            <h1 class="text-4xl md:text-7xl font-sci mb-2 text-center text-rose-500 glow-text font-black tracking-wider">MATH BLASTER</h1>
-            <h2 class="text-lg md:text-3xl font-sci mb-8 text-center text-rose-300 tracking-widest">TRAJECTORY EDITION</h2>
+            <h1 class="text-4xl md:text-7xl font-sci mb-2 text-center text-rose-500 glow-text font-black tracking-wider">TIME BLASTER</h1>
+            <h2 class="text-lg md:text-3xl font-sci mb-8 text-center text-rose-300 tracking-widest">HISTORY EDITION</h2>
             
             <div class="bg-red-950/90 border-2 border-rose-600 p-6 rounded-2xl mb-8 max-w-lg w-[95%] shadow-2xl shadow-rose-900/50 pointer-events-auto">
                 <h3 class="font-sci text-2xl text-rose-400 mb-4 border-b border-rose-900 pb-2 text-center">Mission Briefing</h3>
                 <ul class="space-y-4 text-base md:text-lg text-orange-50 text-left font-semibold">
                     <li class="flex items-start">
                         <span class="text-2xl mr-3 mt-1">🧠</span> 
-                        <div><strong>Solve the equation</strong> at the top of your HUD.</div>
+                        <div><strong>Solve the historical clue</strong> at the top of your HUD.</div>
                     </li>
                     <li class="flex items-start">
                         <span class="text-2xl mr-3 mt-1">🎯</span> 
-                        <div><strong>Drag and release</strong> to shoot the celestial target holding the <strong>CORRECT ANSWER</strong>.</div>
+                        <div><strong>Drag and release</strong> to launch your chronos-capsule at the correct answer node.</div>
                     </li>
                     <li class="flex items-start">
                         <span class="text-2xl mr-3 mt-1">💥</span> 
-                        <div>Hitting a wrong answer or running out of time damages your integrity (Lives).</div>
+                        <div>Hitting an incorrect historic timeline or running out of time damages your temporal integrity (Lives).</div>
                     </li>
                     <li class="flex items-start">
-                        <span class="text-2xl mr-3 mt-1">🌍</span> 
-                        <div>Adapt to changing physics! Gravity shifts on different planets!</div>
+                        <span class="text-2xl mr-3 mt-1">⏳</span> 
+                        <div>Era shifts will alter gravity and timeline controls. Adapt to survive!</div>
                     </li>
                 </ul>
             </div>
@@ -263,18 +263,18 @@
     <!-- END SCREEN (Fully Scrollable on Phones) -->
     <div id="screen-end" class="screen">
         <div class="screen-content">
-            <h1 id="end-title" class="text-4xl md:text-6xl font-sci mb-2 text-center text-amber-400 glow-text">SIMULATION COMPLETE</h1>
+            <h1 id="end-title" class="text-4xl md:text-6xl font-sci mb-2 text-center text-amber-400 glow-text">TIMELINE RESTORED</h1>
             <h2 id="end-subtitle" class="text-lg md:text-2xl font-sci mb-6 text-center text-rose-200"></h2>
             
             <div class="text-5xl mb-6 tracking-[10px]" id="end-stars">⭐⭐⭐</div>
             
             <div class="bg-red-950/90 border-2 border-rose-600 p-6 rounded-2xl mb-8 w-80 text-center shadow-xl pointer-events-auto">
-                <div class="text-rose-400 text-sm font-bold uppercase tracking-wider mb-2">Final Diagnostic</div>
+                <div class="text-rose-400 text-sm font-bold uppercase tracking-wider mb-2">Temporal Report</div>
                 <div class="text-4xl font-sci text-white glow-text mb-4" id="end-score-display">Level 10</div>
                 <p id="end-msg" class="text-orange-100 font-semibold text-lg"></p>
             </div>
 
-            <button onclick="showScreen('screen-start')" class="btn pointer-events-auto">RESTART SIMULATION</button>
+            <button onclick="showScreen('screen-start')" class="btn pointer-events-auto">RESTART EXPEDITION</button>
         </div>
     </div>
 
@@ -368,54 +368,104 @@
 
         let targets = [];
         let particles = [];
-        let currentMath = { q: "", a: 0 };
+        let currentHistory = { q: "", a: "" };
 
-        function generateMath(level) {
-            let num1, num2, op, ans;
-            // Difficulty scaling
-            if (level <= 3) { 
-                op = '+'; num1 = Math.floor(Math.random()*10)+1; num2 = Math.floor(Math.random()*10)+1; ans = num1+num2; 
+        // Primary School History Database (10 levels)
+        const historyDatabase = [
+            {
+                level: 1,
+                q: "What reptiles ruled the Earth millions of years ago?",
+                a: "Dinosaurs",
+                wrongs: ["Mammoths", "Lions"]
+            },
+            {
+                level: 2,
+                q: "What massive stone tombs did Egyptian Pharaohs build?",
+                a: "Pyramids",
+                wrongs: ["Castles", "Towers"]
+            },
+            {
+                level: 3,
+                q: "In which ancient country did the Olympic Games begin?",
+                a: "Greece",
+                wrongs: ["China", "Rome"]
+            },
+            {
+                level: 4,
+                q: "What protective metal suit did medieval knights wear?",
+                a: "Armor",
+                wrongs: ["Togas", "Capes"]
+            },
+            {
+                level: 5,
+                q: "Who painted the famous Mona Lisa portrait?",
+                a: "Da Vinci",
+                wrongs: ["Edison", "Newton"]
+            },
+            {
+                level: 6,
+                q: "Which brave ancient explorers sailed in Dragon ships?",
+                a: "Vikings",
+                wrongs: ["Romans", "Greeks"]
+            },
+            {
+                level: 7,
+                q: "Who was the very first President of the USA?",
+                a: "Washington",
+                wrongs: ["Lincoln", "Jefferson"]
+            },
+            {
+                level: 8,
+                q: "Who is famous for inventing the electric light bulb?",
+                a: "Edison",
+                wrongs: ["Tesla", "Bell"]
+            },
+            {
+                level: 9,
+                q: "What brothers successfully flew the first airplane?",
+                a: "Wright",
+                wrongs: ["Grimm", "Warner"]
+            },
+            {
+                level: 10,
+                q: "Who was the first person to walk on the Moon?",
+                a: "Armstrong",
+                wrongs: ["Gagarin", "Aldrin"]
             }
-            else if (level <= 6) { 
-                op = '-'; num1 = Math.floor(Math.random()*15)+5; num2 = Math.floor(Math.random()*num1)+1; ans = num1-num2; 
-            }
-            else { 
-                op = '×'; num1 = Math.floor(Math.random()*6)+2; num2 = Math.floor(Math.random()*5)+2; ans = num1*num2; 
-            }
-            
-            currentMath = { q: `${num1} ${op} ${num2} = ?`, a: ans };
-            
-            // Sync equation fields
-            document.getElementById('ui-equation').innerText = currentMath.q;
-            document.getElementById('ui-equation-mob').innerText = currentMath.q;
+        ];
 
-            // Generate two plausible but incorrect answers
-            let wrongs = [ans + Math.floor(Math.random()*4)+1, ans - Math.floor(Math.random()*3)-1];
-            if(wrongs[1] < 0) wrongs[1] = ans + Math.floor(Math.random()*3)+4; // Prevent negatives
-            if(wrongs[0] === ans) wrongs[0]++;
-            if(wrongs[1] === ans || wrongs[1] === wrongs[0]) wrongs[1] += 2;
+        function generateHistoryQuestion(level) {
+            let idx = Math.min(level - 1, 9);
+            let data = historyDatabase[idx];
             
-            // Return array randomly shuffled
-            return [ans, wrongs[0], wrongs[1]].sort(() => Math.random() - 0.5);
+            currentHistory = { q: data.q, a: data.a };
+            
+            // Sync question fields
+            document.getElementById('ui-equation').innerText = currentHistory.q;
+            document.getElementById('ui-equation-mob').innerText = currentHistory.q;
+
+            // Gather options and shuffle
+            let options = [data.a, ...data.wrongs];
+            return options.sort(() => Math.random() - 0.5);
         }
 
         function loadLevel() {
             projectile.active = false;
             projectile.trail = [];
-            state.timeRemaining = 20;
+            state.timeRemaining = 24; // slightly more time for reading clues
             state.lastTime = performance.now();
 
             const levelData = [
-                { r: 45, mov: false, spd: 0, g: 0.4, gl: "ADDITION | NORMAL GRAVITY", c: '#38bdf8' },
-                { r: 40, mov: false, spd: 0, g: 0.4, gl: "ADDITION | NORMAL GRAVITY", c: '#38bdf8' },
-                { r: 40, mov: true, spd: 1.5, g: 0.15, gl: "ADDITION | MOON GRAVITY", c: '#fde047' },
-                { r: 45, mov: false, spd: 0, g: 0.4, gl: "SUBTRACTION | NORMAL", c: '#f43f5e' },
-                { r: 40, mov: true, spd: 2, g: 0.8, gl: "SUBTRACTION | HIGH GRAVITY", c: '#e11d48' },
-                { r: 35, mov: true, spd: 2.5, g: 0.15, gl: "SUBTRACTION | MOON GRAVITY", c: '#fde047' },
-                { r: 40, mov: false, spd: 0, g: 0.4, gl: "MULTIPLICATION | NORMAL", c: '#c084fc' },
-                { r: 35, mov: true, spd: 3, g: 1.0, gl: "MULTIPLICATION | EXTREME", c: '#4ade80' },
-                { r: 35, mov: true, spd: 3.5, g: 0.15, gl: "MULTIPLICATION | FLOAT", c: '#a855f7' },
-                { r: 35, mov: true, spd: 4, g: 0.8, gl: "FINAL | MAXIMUM ORBIT", c: '#facc15' }
+                { r: 52, mov: false, spd: 0, g: 0.4, gl: "ICE AGE | EARTH GRAVITY", c: '#38bdf8' },
+                { r: 52, mov: false, spd: 0, g: 0.4, gl: "ANCIENT EGYPT | EARTH GRAVITY", c: '#38bdf8' },
+                { r: 50, mov: true, spd: 1.5, g: 0.15, gl: "ANCIENT GREECE | MOON GRAVITY", c: '#fde047' },
+                { r: 52, mov: false, spd: 0, g: 0.4, gl: "MIDDLE AGES | EARTH GRAVITY", c: '#f43f5e' },
+                { r: 48, mov: true, spd: 2, g: 0.8, gl: "RENAISSANCE | HEAVY GRAVITY", c: '#e11d48' },
+                { r: 48, mov: true, spd: 2.2, g: 0.15, gl: "AGE OF VIKINGS | MOON GRAVITY", c: '#fde047' },
+                { r: 52, mov: false, spd: 0, g: 0.4, gl: "NEW WORLD | EARTH GRAVITY", c: '#c084fc' },
+                { r: 48, mov: true, spd: 2.5, g: 1.0, gl: "INDUSTRIAL ERA | EXTREME GRAVITY", c: '#4ade80' },
+                { r: 46, mov: true, spd: 2.8, g: 0.15, gl: "AGE OF FLIGHT | ORBIT FLOAT", c: '#a855f7' },
+                { r: 46, mov: true, spd: 3.2, g: 0.8, gl: "SPACE AGE | MAXIMUM ORBIT", c: '#facc15' }
             ];
 
             let idx = Math.min(state.level - 1, 9);
@@ -431,7 +481,7 @@
             document.getElementById('ui-level').innerText = lvlText;
             document.getElementById('ui-level-mob').innerText = lvlText;
 
-            let answers = generateMath(state.level);
+            let answers = generateHistoryQuestion(state.level);
             
             // Prevent targets spawning hidden behind HUD overlays
             let hudOffset = width < 768 ? 140 : 90;
@@ -447,8 +497,8 @@
             targets = [];
             for(let i=0; i<3; i++) {
                 let targetX = width < 600 ? 
-                    (width * 0.65 + Math.random() * (width * 0.12)) : 
-                    (width * 0.7 + Math.random() * (width * 0.15));
+                    (width * 0.62 + Math.random() * (width * 0.12)) : 
+                    (width * 0.68 + Math.random() * (width * 0.15));
                 
                 targets.push({
                     x: targetX, 
@@ -459,7 +509,7 @@
                     moveSpeed: d.spd,
                     moveAngle: Math.random() * Math.PI * 2,
                     value: answers[i],
-                    isCorrect: answers[i] === currentMath.a,
+                    isCorrect: answers[i] === currentHistory.a,
                     color: d.c
                 });
             }
@@ -580,16 +630,16 @@
 
             if (isWin) {
                 stars.innerText = '⭐⭐⭐';
-                title.innerText = "MISSION ACCOMPLISHED";
+                title.innerText = "EXPEDITION COMPLETE";
                 title.className = "text-5xl md:text-6xl font-sci mb-2 text-center text-amber-400 glow-text";
-                sub.innerText = "Excellent understanding of math & physics!";
-                msg.innerText = "You successfully solved all 10 trajectory equations!";
+                sub.innerText = "Excellent historical & scientific navigation!";
+                msg.innerText = "You successfully navigated all 10 historical timelines!";
             } else {
                 stars.innerText = state.level >= 7 ? '⭐⭐' : (state.level >= 3 ? '⭐' : '💥');
-                title.innerText = "SIMULATION FAILED";
+                title.innerText = "TIMELINE COLLAPSE";
                 title.className = "text-5xl md:text-6xl font-sci mb-2 text-center text-rose-500 glow-text";
-                sub.innerText = "Structural integrity compromised.";
-                msg.innerText = "Review your calculations and try again.";
+                sub.innerText = "Temporal structure compromised.";
+                msg.innerText = "Re-study the historical clues and try again.";
             }
 
             showScreen('screen-end');
@@ -614,7 +664,7 @@
                 
                 if (state.timeRemaining <= 0) {
                     handleMiss();
-                    state.timeRemaining = 20; 
+                    state.timeRemaining = 24; 
                 }
             } else {
                 state.lastTime = currentTime; // keep updating time so dt doesn't blow up
@@ -639,13 +689,19 @@
                 ctx.strokeStyle = t.color; 
                 ctx.stroke();
                 
-                // Draw Number Answer inside Target
+                // Draw Historical Answer inside Target (with responsive font-size calculation)
                 ctx.shadowBlur = 0; // turn off shadow for text
-                ctx.font = `bold ${t.radius * 0.9}px 'Orbitron', sans-serif`;
+                let textStr = String(t.value);
+                let fontSize = t.radius * 0.35; // Default font ratio
+                if (textStr.length > 8) {
+                    fontSize = t.radius * 0.24; // Shrink font slightly for longer historical names
+                }
+                
+                ctx.font = `bold ${fontSize}px 'Orbitron', sans-serif`;
                 ctx.fillStyle = '#ffffff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(t.value, t.x, t.y + 2);
+                ctx.fillText(textStr, t.x, t.y + 2);
             });
 
             // Update & Draw Projectile
