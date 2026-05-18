@@ -231,7 +231,6 @@
     </div>
 
     <script>
-        // --- AUDIO SYNTHESIS ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
@@ -293,7 +292,6 @@
         }
         window.addEventListener('resize', resize);
 
-        // --- GAME ENGINE STATE variables ---
         let state = {
             running: false,
             level: 1,
@@ -479,7 +477,7 @@
 
         function updateLivesUI() {
             let h = '';
-            for(let i=0; i<state.lives; i++) h += '❤️';
+            for(let i=0; i<state.lives; i++) h += '❤️❤️❤️';
             document.getElementById('ui-lives').innerText = h || '💥';
         }
 
