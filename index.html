@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Blaster: Trajectory Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #1a0505; /* Deep maroon/black base */
+            font-family: 'Orbitron', sans-serif;
+            touch-action: none; /* Prevent scroll on mobile drag */
+        }
+
+        #game-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #2e0808 0%, #110000 100%);
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through to canvas by default */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            pointer-events: auto; /* Re-enable clicks for menus */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(20, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 50;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(40, 5, 5, 0.9);
+            border: 2px solid #e11d48;
+            border-radius: 12px;
+            padding: 10px 20px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
+            pointer-events: auto; /* Optional: if we want hover effects */
+        }
+
+        .physics-data {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.9rem;
+            color: #fca5a5;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f43f5e;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .font-sci {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #be123c, #e11d48);
+            color: white;
+            border: 2px solid #fda4af;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(225, 29, 72, 0.6);
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(251, 113, 133, 0.8);
+            background: linear-gradient(45deg, #e11d48, #f43f5e);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Grid background pattern */
+        .grid-bg {
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 0, 0, 0.05) 1px, transparent 1px);
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+    <canvas id="game-canvas"></canvas>
+
+    <!-- IN-GAME UI (HUD) -->
+    <div class="ui-layer" id="game-ui" style="display: none;">
+        <div class="hud-top">
+            <div class="hud-panel">
+                <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Level Target</div>
+                <div class="font-sci text-2xl text-white"><span id="ui-level">1</span> / 10</div>
+            </div>
+            
+            <div class="hud-panel flex-grow mx-4 max-w-lg bg-red-950/80 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <div class="text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">Target Equation</div>
+                <div class="font-sci text-3xl md:text-4xl text-white glow-text" id="ui-equation">5 + 5 = ?</div>
+            </div>
+            
+            <div class="hud-panel w-48">
+                <div class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">Time Energy</div>
+                <div class="font-sci text-3xl text-amber-400 glow-text" id="ui-time">20s</div>
+            </div>
+            
+            <div class="hud-panel">
+                <div class="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">Structural Integrity</div>
+                <div class="text-2xl tracking-widest drop-shadow-md" id="ui-lives">❤️❤️❤️</div>
+            </div>
+        </div>
+        
+        <div class="physics-data font-sci glow-text" id="ui-physics-env">
+            NORMAL GRAVITY
+        </div>
+    </div>
+
+    <div id="screen-start" class="screen active">
+        <h1 class="text-5xl md:text-7xl font-sci mb-2 text-center text-rose-500 glow-text font-black tracking-wider">MATH BLASTER</h1>
+        <h2 class="text-xl md:text-3xl font-sci mb-8 text-center text-rose-300 tracking-widest">TRAJECTORY EDITION</h2>
+        
+        <div class="bg-red-950/90 border-2 border-rose-600 p-6 rounded-2xl mb-8 max-w-lg w-[90%] shadow-2xl shadow-rose-900/50 pointer-events-auto">
+            <h3 class="font-sci text-2xl text-rose-400 mb-4 border-b border-rose-900 pb-2 text-center">Mission Briefing</h3>
+            <ul class="space-y-4 text-lg text-orange-50 text-left font-semibold">
+                <li class="flex items-start">
+                    <span class="text-2xl mr-3 mt-1">🧠</span> 
+                    <div><strong>Solve the equation</strong> at the top of your HUD.</div>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-2xl mr-3 mt-1">🎯</span> 
+                    <div><strong>Drag and release</strong> to shoot the celestial target holding the <strong>CORRECT ANSWER</strong>.</div>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-2xl mr-3 mt-1">💥</span> 
+                    <div>Hitting a wrong answer or running out of time damages your integrity (Lives).</div>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-2xl mr-3 mt-1">🌍</span> 
+                    <div>Adapt to changing physics! Gravity shifts on different planets!</div>
+                </li>
+            </ul>
+        </div>
+
+        <button onclick="startGame()" class="btn pointer-events-auto">INITIALIZE</button>
+    </div>
+
+    <div id="screen-end" class="screen">
+        <h1 id="end-title" class="text-5xl md:text-6xl font-sci mb-2 text-center text-amber-400 glow-text">SIMULATION COMPLETE</h1>
+        <h2 id="end-subtitle" class="text-xl md:text-2xl font-sci mb-6 text-center text-rose-200"></h2>
+        
+        <div class="text-6xl mb-6 tracking-[10px]" id="end-stars">⭐⭐⭐</div>
+        
+        <div class="bg-red-950/90 border-2 border-rose-600 p-6 rounded-2xl mb-8 w-80 text-center shadow-xl pointer-events-auto">
+            <div class="text-rose-400 text-sm font-bold uppercase tracking-wider mb-2">Final Diagnostic</div>
+            <div class="text-4xl font-sci text-white glow-text mb-4" id="end-score-display">Level 10</div>
+            <p id="end-msg" class="text-orange-100 font-semibold text-lg"></p>
+        </div>
+
+        <button onclick="showScreen('screen-start')" class="btn pointer-events-auto">RESTART SIMULATION</button>
+    </div>
+
+    <script>
+        // --- AUDIO SYNTHESIS ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        const sfx = {
+            shoot: () => {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            },
+            hit: () => {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(660, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            },
+            error: () => {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        };
+
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            cannon.x = 80;
+            cannon.y = height - 100;
+        }
+        window.addEventListener('resize', resize);
+
+        // Game State Variables
+        let state = {
+            running: false,
+            level: 1,
+            maxLevels: 10,
+            lives: 3,
+            gravity: 0.4,
+            gravityLabel: "NORMAL GRAVITY",
+            timeRemaining: 20,
+            lastTime: 0
+        };
+
+        // Cannon & Aiming variables
+        let cannon = { x: 80, y: 0, radius: 25 };
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let dragCurrent = { x: 0, y: 0 };
+
+        // Game Objects
+        let projectile = {
+            active: false,
+            x: 0, y: 0,
+            vx: 0, vy: 0,
+            radius: 12,
+            trail: []
+        };
+
+        let targets = [];
+        let particles = [];
+        let currentMath = { q: "", a: 0 };
+
+        function generateMath(level) {
+            let num1, num2, op, ans;
+            // Difficulty scaling
+            if (level <= 3) { 
+                op = '+'; num1 = Math.floor(Math.random()*10)+1; num2 = Math.floor(Math.random()*10)+1; ans = num1+num2; 
+            }
+            else if (level <= 6) { 
+                op = '-'; num1 = Math.floor(Math.random()*15)+5; num2 = Math.floor(Math.random()*num1)+1; ans = num1-num2; 
+            }
+            else { 
+                op = '×'; num1 = Math.floor(Math.random()*6)+2; num2 = Math.floor(Math.random()*5)+2; ans = num1*num2; 
+            }
+            
+            currentMath = { q: `${num1} ${op} ${num2} = ?`, a: ans };
+            document.getElementById('ui-equation').innerText = currentMath.q;
+
+            // Generate two plausible but incorrect answers
+            let wrongs = [ans + Math.floor(Math.random()*4)+1, ans - Math.floor(Math.random()*3)-1];
+            if(wrongs[1] < 0) wrongs[1] = ans + Math.floor(Math.random()*3)+4; // Prevent negatives
+            if(wrongs[0] === ans) wrongs[0]++;
+            if(wrongs[1] === ans || wrongs[1] === wrongs[0]) wrongs[1] += 2;
+            
+            // Return array randomly shuffled
+            return [ans, wrongs[0], wrongs[1]].sort(() => Math.random() - 0.5);
+        }
+
+        function loadLevel() {
+            projectile.active = false;
+            projectile.trail = [];
+            state.timeRemaining = 20;
+            state.lastTime = performance.now();
+
+            const levelData = [
+                { r: 45, mov: false, spd: 0, g: 0.4, gl: "ADDITION | NORMAL GRAVITY", c: '#38bdf8' },
+                { r: 40, mov: false, spd: 0, g: 0.4, gl: "ADDITION | NORMAL GRAVITY", c: '#38bdf8' },
+                { r: 40, mov: true, spd: 1.5, g: 0.15, gl: "ADDITION | MOON GRAVITY", c: '#fde047' },
+                { r: 45, mov: false, spd: 0, g: 0.4, gl: "SUBTRACTION | NORMAL GRAVITY", c: '#f43f5e' },
+                { r: 40, mov: true, spd: 2, g: 0.8, gl: "SUBTRACTION | HIGH GRAVITY", c: '#e11d48' },
+                { r: 35, mov: true, spd: 2.5, g: 0.15, gl: "SUBTRACTION | MOON GRAVITY", c: '#fde047' },
+                { r: 40, mov: false, spd: 0, g: 0.4, gl: "MULTIPLICATION | NORMAL", c: '#c084fc' },
+                { r: 35, mov: true, spd: 3, g: 1.0, gl: "MULTIPLICATION | EXTREME", c: '#4ade80' },
+                { r: 35, mov: true, spd: 3.5, g: 0.15, gl: "MULTIPLICATION | FLOAT", c: '#a855f7' },
+                { r: 35, mov: true, spd: 4, g: 0.8, gl: "FINAL | MAXIMUM ORBIT", c: '#facc15' }
+            ];
+
+            let idx = Math.min(state.level - 1, 9);
+            let d = levelData[idx];
+
+            state.gravity = d.g;
+            state.gravityLabel = d.gl;
+            document.getElementById('ui-physics-env').style.color = d.c;
+            document.getElementById('ui-level').innerText = state.level;
+            document.getElementById('ui-physics-env').innerText = state.gravityLabel;
+
+            let answers = generateMath(state.level);
+            
+            // Spawn 3 targets at random heights on the right side
+            targets = [];
+            const yPositions = [height * 0.25, height * 0.5, height * 0.75];
+            yPositions.sort(() => Math.random() - 0.5); // Shuffle heights
+
+            for(let i=0; i<3; i++) {
+                targets.push({
+                    x: width * 0.7 + Math.random() * (width * 0.15), 
+                    y: yPositions[i],
+                    baseY: yPositions[i],
+                    radius: d.r,
+                    moving: d.mov,
+                    moveSpeed: d.spd,
+                    moveAngle: Math.random() * Math.PI * 2,
+                    value: answers[i],
+                    isCorrect: answers[i] === currentMath.a,
+                    color: d.c
+                });
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 15;
+                this.vy = (Math.random() - 0.5) * 15;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.02 + 0.02;
+                this.color = color;
+                this.size = Math.random() * 5 + 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+            }
+            draw() {
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function createExplosion(x, y, color) {
+            for(let i=0; i<40; i++) particles.push(new Particle(x, y, color));
+        }
+
+        function handleHit(isCorrect, targetObj) {
+            if (isCorrect) {
+                sfx.hit();
+                createExplosion(targetObj.x, targetObj.y, '#4ade80'); // Green explosion
+                projectile.active = false;
+                
+                setTimeout(() => {
+                    state.level++;
+                    if (state.level > state.maxLevels) {
+                        endGame(true);
+                    } else {
+                        loadLevel();
+                    }
+                }, 1000);
+            } else {
+                sfx.error();
+                createExplosion(targetObj.x, targetObj.y, '#e11d48'); // Red explosion
+                projectile.active = false;
+                
+                state.lives--;
+                updateLivesUI();
+                
+                if (state.lives <= 0) {
+                    setTimeout(() => endGame(false), 500);
+                } else {
+                    // Respawn targets so they have a fresh chance to aim
+                    setTimeout(loadLevel, 500); 
+                }
+            }
+        }
+
+        function handleMiss() {
+            sfx.error();
+            createExplosion(projectile.x, projectile.y, '#9f1239'); // Dark red explosion
+            projectile.active = false;
+            
+            state.lives--;
+            updateLivesUI();
+            
+            if (state.lives <= 0) {
+                setTimeout(() => endGame(false), 500);
+            } else {
+                setTimeout(loadLevel, 500);
+            }
+        }
+
+        function updateLivesUI() {
+            let h = '';
+            for(let i=0; i<state.lives; i++) h += '❤️❤️';
+            document.getElementById('ui-lives').innerText = h || '💥';
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            if(id) document.getElementById(id).classList.add('active');
+        }
+
+        function startGame() {
+            audioCtx.resume();
+            state.level = 1;
+            state.lives = 3;
+            state.running = true;
+            updateLivesUI();
+            showScreen(null); // Hide all screens
+            document.getElementById('game-ui').style.display = 'block';
+            resize();
+            loadLevel();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame(isWin) {
+            state.running = false;
+            document.getElementById('game-ui').style.display = 'none';
+            
+            const title = document.getElementById('end-title');
+            const sub = document.getElementById('end-subtitle');
+            const msg = document.getElementById('end-msg');
+            const stars = document.getElementById('end-stars');
+
+            document.getElementById('end-score-display').innerText = `Level ${Math.min(state.level, 10)}`;
+
+            if (isWin) {
+                stars.innerText = '⭐⭐⭐';
+                title.innerText = "MISSION ACCOMPLISHED";
+                title.className = "text-5xl md:text-6xl font-sci mb-2 text-center text-amber-400 glow-text";
+                sub.innerText = "Excellent understanding of math & physics!";
+                msg.innerText = "You successfully solved all 10 trajectory equations!";
+            } else {
+                stars.innerText = state.level >= 7 ? '⭐⭐' : (state.level >= 3 ? '⭐' : '💥');
+                title.innerText = "SIMULATION FAILED";
+                title.className = "text-5xl md:text-6xl font-sci mb-2 text-center text-rose-500 glow-text";
+                sub.innerText = "Structural integrity compromised.";
+                msg.innerText = "Review your calculations and try again.";
+            }
+
+            showScreen('screen-end');
+        }
+
+        function gameLoop(currentTime) {
+            if (!state.running) return;
+
+            let dt = (currentTime - state.lastTime) / 1000;
+            if (dt > 1) dt = 1; // Prevent massive jumps if tab is inactive
+            
+            ctx.clearRect(0, 0, width, height);
+
+            // Timer update (Only if projectile is not flying)
+            if (!projectile.active) {
+                state.lastTime = currentTime;
+                state.timeRemaining -= dt;
+                document.getElementById('ui-time').innerText = Math.ceil(Math.max(0, state.timeRemaining)) + 's';
+                
+                if (state.timeRemaining <= 0) {
+                    handleMiss();
+                    state.timeRemaining = 20; 
+                }
+            } else {
+                state.lastTime = currentTime; // keep updating time so dt doesn't blow up
+            }
+
+            // Draw Targets
+            targets.forEach(t => {
+                if (t.moving) {
+                    t.moveAngle += t.moveSpeed * dt;
+                    t.y = t.baseY + Math.sin(t.moveAngle) * 70; // Move up and down
+                }
+
+                // Outer glow
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = t.color;
+                
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI*2);
+                ctx.fillStyle = 'rgba(40, 5, 5, 0.9)'; 
+                ctx.fill();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = t.color; 
+                ctx.stroke();
+                
+                // Draw Number Answer inside Target
+                ctx.shadowBlur = 0; // turn off shadow for text
+                ctx.font = `bold ${t.radius * 0.9}px 'Orbitron', sans-serif`;
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(t.value, t.x, t.y + 2);
+            });
+
+            // Update & Draw Projectile
+            if (projectile.active) {
+                projectile.trail.push({x: projectile.x, y: projectile.y});
+                if(projectile.trail.length > 25) projectile.trail.shift();
+
+                projectile.vy += state.gravity;
+                projectile.x += projectile.vx;
+                projectile.y += projectile.vy;
+
+                // Collision Check against all 3 targets
+                let hitAny = false;
+                for (let t of targets) {
+                    let dist = Math.hypot(projectile.x - t.x, projectile.y - t.y);
+                    if (dist < t.radius + projectile.radius) {
+                        handleHit(t.isCorrect, t);
+                        hitAny = true;
+                        break;
+                    }
+                }
+
+                // Screen bounds miss
+                if (!hitAny && (projectile.y > height + 50 || projectile.x > width + 50 || projectile.x < -50)) {
+                    handleMiss();
+                }
+
+                // Draw Trail
+                ctx.beginPath();
+                if (projectile.trail.length > 0) {
+                    ctx.moveTo(projectile.trail[0].x, projectile.trail[0].y);
+                    for(let i=1; i<projectile.trail.length; i++) {
+                        ctx.lineTo(projectile.trail[i].x, projectile.trail[i].y);
+                    }
+                    ctx.strokeStyle = 'rgba(251, 146, 60, 0.5)';
+                    ctx.lineWidth = projectile.radius;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
+
+                // Draw Energy Ball
+                ctx.beginPath();
+                ctx.arc(projectile.x, projectile.y, projectile.radius, 0, Math.PI*2);
+                ctx.fillStyle = '#f97316'; // Orange glow
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#f97316';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // Draw Cannon Base
+            ctx.beginPath();
+            ctx.arc(cannon.x, cannon.y, cannon.radius, 0, Math.PI, true);
+            ctx.fillStyle = '#64748b'; // metal color
+            ctx.fill();
+
+            if (isDragging && !projectile.active) {
+                let dx = dragStart.x - dragCurrent.x;
+                let dy = dragStart.y - dragCurrent.y;
+                
+                // Limit max power drag
+                let dist = Math.hypot(dx, dy);
+                let maxDist = 200;
+                if (dist > maxDist) {
+                    dx = (dx / dist) * maxDist;
+                    dy = (dy / dist) * maxDist;
+                }
+
+                let pvx = dx * 0.25; // Sensitivity multiplier
+                let pvy = dy * 0.25;
+
+                // Draw Predicted Trajectory (Dots)
+                ctx.fillStyle = 'rgba(244, 63, 94, 0.7)'; // Rose dot prediction
+                let simX = cannon.x;
+                let simY = cannon.y;
+                let simVy = pvy;
+
+                for (let i = 0; i < 45; i++) {
+                    simVy += state.gravity;
+                    simX += pvx;
+                    simY += simVy;
+                    if (i % 3 === 0) {
+                        ctx.beginPath();
+                        ctx.arc(simX, simY, 3, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                }
+
+                // Draw Pull Line
+                ctx.beginPath();
+                ctx.moveTo(cannon.x, cannon.y);
+                ctx.lineTo(cannon.x - dx, cannon.y - dy);
+                ctx.strokeStyle = '#f43f5e';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+                // Draw "held" ball
+                ctx.beginPath();
+                ctx.arc(cannon.x - dx, cannon.y - dy, projectile.radius, 0, Math.PI*2);
+                ctx.fillStyle = '#fb923c';
+                ctx.fill();
+            } else if (!projectile.active) {
+                // Idle ball resting in cannon
+                ctx.beginPath();
+                ctx.arc(cannon.x, cannon.y - 10, projectile.radius, 0, Math.PI*2);
+                ctx.fillStyle = '#fb923c';
+                ctx.fill();
+            }
+
+            // Update & Draw Particles
+            for(let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update();
+                p.draw();
+                if(p.life <= 0) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function handleDown(e) {
+            if (!state.running || projectile.active) return;
+            isDragging = true;
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            dragStart = { x: clientX, y: clientY };
+            dragCurrent = { x: clientX, y: clientY };
+        }
+
+        function handleMove(e) {
+            if (!isDragging) return;
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            dragCurrent = { x: clientX, y: clientY };
+        }
+
+        function handleUp(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            let dx = dragStart.x - dragCurrent.x;
+            let dy = dragStart.y - dragCurrent.y;
+            
+            let dist = Math.hypot(dx, dy);
+            // Minimum drag to shoot
+            if (dist > 20) {
+                let maxDist = 200;
+                if (dist > maxDist) {
+                    dx = (dx / dist) * maxDist;
+                    dy = (dy / dist) * maxDist;
+                }
+
+                sfx.shoot();
+                projectile.active = true;
+                projectile.x = cannon.x;
+                projectile.y = cannon.y;
+                projectile.vx = dx * 0.25; 
+                projectile.vy = dy * 0.25;
+            }
+        }
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', handleDown);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleUp);
+
+        // Touch Events
+        canvas.addEventListener('touchstart', handleDown, {passive: false});
+        window.addEventListener('touchmove', handleMove, {passive: false});
+        window.addEventListener('touchend', handleUp);
+
+        // Initial setup
+        resize();
+    </script>
+</body>
+</html>
